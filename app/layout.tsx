@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Jost } from "next/font/google";
-
 import "./globals.css";
 import { siteConfig } from "@/config/site";
-
 import Header from "@/widgets/header/header";
 import Footer from "@/widgets/footer/footer";
 
