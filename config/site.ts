@@ -5,8 +5,8 @@ export const siteConfig = {
   description:
     "Thoughtful design. Flawless execution. Interiors that elevate everyday living.",
   phone: "+91 98765 43210",
-  email: "hello@shipradesigns.in",
-  address: "Bilaspur, Chhattisgarh, India",
+  email: "elementsbyshipra@gmail.com",
+  address: "Ambikapur, Chhattisgarh, India",
   heroStatement: "We don't just design spaces, we craft experiences.",
   heroSupport:
     "Thoughtful design. Flawless execution. Interiors that elevate everyday living.",

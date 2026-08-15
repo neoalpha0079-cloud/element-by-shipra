@@ -1,499 +1,217 @@
 "use client";
 
-import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useState } from "react";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 
-import {
-  areaOptions,
-  budgetOptions,
-  projectTypeOptions,
-  spaceTypeOptions,
-  styleOptions,
-  timeOptions,
-} from "@/features/consultation/data/options";
-import { cn } from "@/shared/utils";
+const serviceOptions = [
+  "Interior Design",
+  "External Elevation",
+  "Vastu Consultation",
+  "Commercial Interiors",
+  "Modular Furniture",
+  "Complete Turnkey",
+];
 
-type FormData = {
-  projectType: string;
-  description: string;
-  spaceType: string;
-  area: string;
-  budget: string;
-  time: string;
-  style: string;
-  name: string;
-  phone: string;
-  email: string;
-};
-
-const initialData: FormData = {
-  projectType: "",
-  description: "",
-  spaceType: "",
-  area: "",
-  budget: "",
-  time: "",
-  style: "",
-  name: "",
-  phone: "",
-  email: "",
-};
-
-const steps = [
-  { index: "01", label: "Your Project" },
-  { index: "02", label: "Your Space" },
-  { index: "03", label: "Your Style" },
-  { index: "04", label: "Contact Details" },
-] as const;
-
-type FieldKey = keyof FormData;
-
-function validateStep(step: number, data: FormData) {
-  const errors: Partial<Record<FieldKey, string>> = {};
-
-  if (step === 0) {
-    if (!data.projectType) errors.projectType = "Please select a project type.";
-  }
-
-  if (step === 1) {
-    if (!data.spaceType) errors.spaceType = "Please select a space type.";
-    if (!data.area) errors.area = "Please select an approximate area.";
-  }
-
-  if (step === 2) {
-    if (!data.budget) errors.budget = "Please select a budget range.";
-    if (!data.style) errors.style = "Please select a style direction.";
-  }
-
-  if (step === 3) {
-    if (!data.name.trim()) errors.name = "Please share your name.";
-    if (!/^[+\d][\d\s-]{8,14}$/.test(data.phone.trim()))
-      errors.phone = "Please enter a valid phone number.";
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim()))
-      errors.email = "Please enter a valid email address.";
-  }
-
-  return errors;
-}
+const budgetRanges = [
+  "₹10L – ₹25L",
+  "₹25L – ₹50L",
+  "₹50L – ₹1Cr",
+  "₹1Cr+",
+];
 
 export function ConsultationForm() {
-  const [step, setStep] = useState(0);
-  const [data, setData] = useState<FormData>(initialData);
-  const [errors, setErrors] = useState<Partial<Record<FieldKey, string>>>({});
+  const [selectedService, setSelectedService] = useState<string>("Interior Design");
+  const [selectedBudget, setSelectedBudget] = useState<string>("₹25L – ₹50L");
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const update = (key: FieldKey, value: string) => {
-    setData((current) => ({ ...current, [key]: value }));
-    setErrors((current) => ({ ...current, [key]: undefined }));
-  };
-
-  const handleNext = () => {
-    const stepErrors = validateStep(step, data);
-    if (Object.keys(stepErrors).length > 0) {
-      setErrors(stepErrors);
-      return;
-    }
-    setStep((current) => current + 1);
-  };
-
-  const handleBack = () => setStep((current) => current - 1);
-
-  const handleSubmit = () => {
-    const stepErrors = validateStep(3, data);
-    if (Object.keys(stepErrors).length > 0) {
-      setErrors(stepErrors);
-      return;
-    }
-    setSubmitted(true);
-  };
-
-  const reset = () => {
-    setData(initialData);
-    setErrors({});
-    setStep(0);
-    setSubmitted(false);
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      setSubmitted(true);
+    }, 800);
   };
 
   if (submitted) {
     return (
-      <div className="flex flex-col items-center gap-6 py-16 text-center md:py-20">
-        <span className="border-champagne/50 bg-champagne/10 text-champagne flex size-16 items-center justify-center rounded-full border">
-          <CheckIcon />
-        </span>
-        <h3 className="text-ivory font-serif text-3xl md:text-4xl">
-          Thank you, {data.name.split(" ")[0]}.
+      <div className="flex min-h-[460px] flex-col items-center justify-center rounded-[32px] border border-[#E8DFC8] bg-white p-8 text-center shadow-[0_20px_50px_rgba(40,25,10,0.04)]">
+        <div className="flex size-16 items-center justify-center rounded-full border border-[#B58544]/40 bg-[#FAF6F0] text-[#B58544]">
+          <CheckCircle2 size={32} strokeWidth={1.5} />
+        </div>
+        <h3 className="mt-5 font-serif text-[28px] font-normal text-[#1A1816]">
+          Inquiry Received
         </h3>
-        <p className="text-ivory/60 max-w-md text-sm leading-7 font-light">
-          Your consultation request has been received. Our team will reach out
-          within one working day to schedule your first conversation.
+        <p className="mt-2 max-w-sm text-[13.5px] leading-relaxed text-[#6E675E]">
+          Thank you for reaching out. Our principal designer will review your requirements and connect with you within 24 hours.
         </p>
         <button
           type="button"
-          onClick={reset}
-          className="text-champagne hover:text-ivory mt-4 text-xs font-medium tracking-[0.2em] uppercase underline-offset-4 transition-colors hover:underline"
+          onClick={() => setSubmitted(false)}
+          className="mt-6 text-[12px] font-semibold tracking-[0.16em] uppercase text-[#B58544] underline underline-offset-4 hover:text-[#9E7134]"
         >
-          Begin another consultation
+          Submit Another Request
         </button>
       </div>
     );
   }
 
-  const progress = ((step + 1) / steps.length) * 100;
-
   return (
-    <div className="border-ivory/15 bg-charcoal/60 relative border p-7 backdrop-blur-sm md:p-12">
-      <div className="border-ivory/10 flex flex-wrap items-center justify-between gap-4 border-b pb-6">
-        <div className="flex items-center gap-6 md:gap-9">
-          {steps.map((item, index) => (
-            <div key={item.index} className="flex items-center gap-6 md:gap-9">
-              <button
-                type="button"
-                onClick={() => index < step && setStep(index)}
-                className={cn(
-                  "flex items-center gap-2.5 text-left",
-                  index < step && "cursor-pointer"
-                )}
-              >
-                <span
-                  className={cn(
-                    "flex size-9 items-center justify-center rounded-full border font-serif text-sm transition-colors duration-300",
-                    index === step
-                      ? "border-champagne bg-champagne text-charcoal"
-                      : index < step
-                        ? "border-champagne/60 text-champagne"
-                        : "border-ivory/20 text-ivory/40"
-                  )}
-                >
-                  {index < step ? (
-                    <CheckIcon className="size-3.5" />
-                  ) : (
-                    item.index
-                  )}
-                </span>
-                <span
-                  className={cn(
-                    "hidden text-[0.7rem] font-medium tracking-[0.22em] uppercase md:block",
-                    index === step ? "text-ivory" : "text-ivory/40"
-                  )}
-                >
-                  {item.label}
-                </span>
-              </button>
-              {index < steps.length - 1 && (
-                <span
-                  aria-hidden
-                  className={cn(
-                    "hidden h-px w-6 md:block",
-                    index < step ? "bg-champagne/60" : "bg-ivory/15"
-                  )}
-                />
-              )}
-            </div>
-          ))}
-        </div>
-        <span className="text-ivory/50 font-serif text-lg">
-          <span className="text-champagne">
-            {String(step + 1).padStart(2, "0")}
-          </span>{" "}
-          / {String(steps.length).padStart(2, "0")}
+    <form
+      onSubmit={handleSubmit}
+      className="relative rounded-[32px] border border-[#E8DFC8] bg-white/90 p-7 shadow-[0_20px_50px_rgba(40,25,10,0.04)] backdrop-blur-md sm:p-10"
+    >
+      {/* Top Subtle Gold Accent Line */}
+      <div className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[#C59A58]/60 to-transparent" />
+
+      {/* Header */}
+      <div className="mb-8">
+        <span className="text-[10px] font-bold tracking-[0.22em] uppercase text-[#B58544]">
+          Step into your vision
         </span>
+        <h3 className="mt-1 font-serif text-[26px] font-normal text-[#1A1816] sm:text-[30px]">
+          Share Your Project Details
+        </h3>
       </div>
 
-      <div className="bg-ivory/10 mt-4 h-px w-full">
-        <div
-          className="bg-champagne h-px transition-all duration-500"
-          style={{ width: `${progress}%` }}
+      {/* 1. Service Selection Chips */}
+      <div className="mb-6">
+        <label className="mb-3 block text-[11px] font-bold tracking-[0.16em] uppercase text-[#4A453E]">
+          Select Service Required
+        </label>
+        <div className="flex flex-wrap gap-2">
+          {serviceOptions.map((service) => {
+            const isSelected = selectedService === service;
+            return (
+              <button
+                type="button"
+                key={service}
+                onClick={() => setSelectedService(service)}
+                className={`rounded-full px-4 py-2 text-[12px] font-medium transition-all ${
+                  isSelected
+                    ? "border border-[#1A1816] bg-[#1A1816] text-[#EAD8BD] shadow-sm"
+                    : "border border-[#E8DFC8] bg-[#FAF8F5] text-[#5A544D] hover:border-[#C59A58]/60 hover:text-[#1A1816]"
+                }`}
+              >
+                {service}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 2. Text Input Grid */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <label className="mb-2 block text-[11px] font-bold tracking-[0.16em] uppercase text-[#4A453E]">
+            Your Full Name *
+          </label>
+          <input
+            required
+            type="text"
+            placeholder="e.g. Vikram Verma"
+            className="w-full rounded-[14px] border border-[#E8DFC8] bg-[#FAF8F5] px-4 py-3.5 text-[13.5px] text-[#1A1816] placeholder:text-[#A29A90] transition-colors focus:border-[#B58544] focus:bg-white focus:outline-none"
+          />
+        </div>
+
+        <div>
+          <label className="mb-2 block text-[11px] font-bold tracking-[0.16em] uppercase text-[#4A453E]">
+            Contact Number *
+          </label>
+          <input
+            required
+            type="tel"
+            placeholder="e.g. +91 98765 43210"
+            className="w-full rounded-[14px] border border-[#E8DFC8] bg-[#FAF8F5] px-4 py-3.5 text-[13.5px] text-[#1A1816] placeholder:text-[#A29A90] transition-colors focus:border-[#B58544] focus:bg-white focus:outline-none"
+          />
+        </div>
+
+        <div>
+          <label className="mb-2 block text-[11px] font-bold tracking-[0.16em] uppercase text-[#4A453E]">
+            Email Address
+          </label>
+          <input
+            type="email"
+            placeholder="e.g. vikram@example.com"
+            className="w-full rounded-[14px] border border-[#E8DFC8] bg-[#FAF8F5] px-4 py-3.5 text-[13.5px] text-[#1A1816] placeholder:text-[#A29A90] transition-colors focus:border-[#B58544] focus:bg-white focus:outline-none"
+          />
+        </div>
+
+        <div>
+          <label className="mb-2 block text-[11px] font-bold tracking-[0.16em] uppercase text-[#4A453E]">
+            Project City / Location *
+          </label>
+          <input
+            required
+            type="text"
+            placeholder="e.g. Bilaspur / Raipur"
+            className="w-full rounded-[14px] border border-[#E8DFC8] bg-[#FAF8F5] px-4 py-3.5 text-[13.5px] text-[#1A1816] placeholder:text-[#A29A90] transition-colors focus:border-[#B58544] focus:bg-white focus:outline-none"
+          />
+        </div>
+      </div>
+
+      {/* 3. Budget Range Selector */}
+      <div className="mt-5">
+        <label className="mb-2.5 block text-[11px] font-bold tracking-[0.16em] uppercase text-[#4A453E]">
+          Estimated Budget
+        </label>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          {budgetRanges.map((range) => {
+            const isSelected = selectedBudget === range;
+            return (
+              <button
+                type="button"
+                key={range}
+                onClick={() => setSelectedBudget(range)}
+                className={`rounded-[12px] px-3 py-2.5 text-center text-[12px] font-medium transition-all ${
+                  isSelected
+                    ? "border-[1.5px] border-[#B58544] bg-[#FAF6F0] font-semibold text-[#B58544]"
+                    : "border border-[#E8DFC8] bg-[#FAF8F5] text-[#6E675E] hover:border-[#C59A58]/50"
+                }`}
+              >
+                {range}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 4. Message Field */}
+      <div className="mt-5">
+        <label className="mb-2 block text-[11px] font-bold tracking-[0.16em] uppercase text-[#4A453E]">
+          Tell Us About Your Space (Optional)
+        </label>
+        <textarea
+          rows={3}
+          placeholder="Describe your space, timeline, and aesthetic preferences..."
+          className="w-full resize-none rounded-[14px] border border-[#E8DFC8] bg-[#FAF8F5] px-4 py-3.5 text-[13.5px] text-[#1A1816] placeholder:text-[#A29A90] transition-colors focus:border-[#B58544] focus:bg-white focus:outline-none"
         />
       </div>
 
-      <div className="mt-10" key={step}>
-        <p className="eyebrow text-champagne">
-          <span className="bg-champagne/60 h-px w-8" aria-hidden />
-          {steps[step].index} — {steps[step].label}
-        </p>
-
-        {step === 0 && (
-          <div className="mt-8 grid grid-cols-1 gap-8 md:grid-cols-2">
-            <Field label="Project Type" error={errors.projectType}>
-              <SelectField
-                value={data.projectType}
-                onChange={(value) => update("projectType", value)}
-                placeholder="Select a project type"
-                options={projectTypeOptions}
-              />
-            </Field>
-            <Field label="Tell us about your project" className="md:col-span-2">
-              <TextareaField
-                value={data.description}
-                onChange={(value) => update("description", value)}
-                placeholder="A short note about what you have in mind…"
-              />
-            </Field>
-          </div>
-        )}
-
-        {step === 1 && (
-          <div className="mt-8 grid grid-cols-1 gap-8 md:grid-cols-2">
-            <Field label="Space Type" error={errors.spaceType}>
-              <SelectField
-                value={data.spaceType}
-                onChange={(value) => update("spaceType", value)}
-                placeholder="Select a space type"
-                options={spaceTypeOptions}
-              />
-            </Field>
-            <Field label="Approximate Area" error={errors.area}>
-              <SelectField
-                value={data.area}
-                onChange={(value) => update("area", value)}
-                placeholder="Select approximate area"
-                options={areaOptions}
-              />
-            </Field>
-          </div>
-        )}
-
-        {step === 2 && (
-          <div className="mt-8 grid grid-cols-1 gap-8 md:grid-cols-2">
-            <Field label="Budget Range" error={errors.budget}>
-              <SelectField
-                value={data.budget}
-                onChange={(value) => update("budget", value)}
-                placeholder="Select a budget range"
-                options={budgetOptions}
-              />
-            </Field>
-            <Field label="Preferred Consultation Time">
-              <SelectField
-                value={data.time}
-                onChange={(value) => update("time", value)}
-                placeholder="Select a time"
-                options={timeOptions}
-              />
-            </Field>
-            <Field label="Style Direction" error={errors.style}>
-              <SelectField
-                value={data.style}
-                onChange={(value) => update("style", value)}
-                placeholder="Select a style direction"
-                options={styleOptions}
-              />
-            </Field>
-          </div>
-        )}
-
-        {step === 3 && (
-          <div className="mt-8 grid grid-cols-1 gap-8 md:grid-cols-2">
-            <Field label="Your Name" error={errors.name}>
-              <TextField
-                value={data.name}
-                onChange={(value) => update("name", value)}
-                placeholder="What should we call you?"
-              />
-            </Field>
-            <Field label="Phone" error={errors.phone}>
-              <TextField
-                value={data.phone}
-                onChange={(value) => update("phone", value)}
-                placeholder="+91 00000 00000"
-                inputMode="tel"
-              />
-            </Field>
-            <Field label="Email" error={errors.email} className="md:col-span-2">
-              <TextField
-                value={data.email}
-                onChange={(value) => update("email", value)}
-                placeholder="you@example.com"
-                inputMode="email"
-              />
-            </Field>
-          </div>
-        )}
-      </div>
-
-      <div className="mt-12 flex items-center justify-between">
+      {/* 5. Submit Button */}
+      <div className="mt-8">
         <button
-          type="button"
-          onClick={handleBack}
-          className={cn(
-            "flex items-center gap-2 text-xs font-medium tracking-[0.2em] uppercase transition-colors",
-            step === 0
-              ? "text-ivory/25 pointer-events-none"
-              : "text-ivory/60 hover:text-champagne"
-          )}
-          disabled={step === 0}
+          type="submit"
+          disabled={loading}
+          className="group relative flex h-13 w-full items-center justify-center gap-3 rounded-full bg-[#1A1816] px-8 text-[13px] font-medium tracking-[0.14em] uppercase text-[#EAD8BD] shadow-lg transition-all duration-300 hover:bg-black active:scale-[0.99] disabled:opacity-75"
         >
-          <ArrowLeft className="size-4" />
-          Back
+          {loading ? (
+            <span>Sending Inquiry...</span>
+          ) : (
+            <>
+              <span>Schedule My Consultation</span>
+              <ArrowRight
+                size={16}
+                strokeWidth={1.75}
+                className="transition-transform duration-300 group-hover:translate-x-1"
+              />
+            </>
+          )}
         </button>
-
-        {step < steps.length - 1 ? (
-          <button
-            type="button"
-            onClick={handleNext}
-            className="group bg-champagne text-charcoal hover:bg-bronze hover:text-ivory inline-flex h-12 items-center gap-3 px-8 text-sm font-medium tracking-[0.1em] uppercase transition-colors duration-300"
-          >
-            Continue
-            <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={handleSubmit}
-            className="group bg-champagne text-charcoal hover:bg-bronze hover:text-ivory inline-flex h-12 items-center gap-3 px-8 text-sm font-medium tracking-[0.1em] uppercase transition-colors duration-300"
-          >
-            Book a Consultation
-            <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
-          </button>
-        )}
       </div>
-    </div>
+    </form>
   );
 }
 
-function CheckIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-      className={className}
-    >
-      <path d="M20 6 9 17l-5-5" />
-    </svg>
-  );
-}
-
-function Field({
-  label,
-  error,
-  className,
-  children,
-}: {
-  label: string;
-  error?: string;
-  className?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <label className={cn("flex flex-col gap-2.5", className)}>
-      <span className="text-ivory/70 text-[0.7rem] font-medium tracking-[0.24em] uppercase">
-        {label}
-      </span>
-      {children}
-      {error && (
-        <span className="text-xs font-light text-red-400">{error}</span>
-      )}
-    </label>
-  );
-}
-
-const darkFieldClass =
-  "border-ivory/25 placeholder:text-ivory/30 focus:border-champagne";
-
-function TextField({
-  value,
-  onChange,
-  placeholder,
-  inputMode,
-}: {
-  value: string;
-  onChange: (value: string) => void;
-  placeholder?: string;
-  inputMode?: "tel" | "email" | "text";
-}) {
-  return (
-    <input
-      type="text"
-      inputMode={inputMode}
-      value={value}
-      onChange={(event) => onChange(event.target.value)}
-      placeholder={placeholder}
-      className={cn(
-        "text-ivory h-12 w-full border-b bg-transparent px-1 text-sm font-light transition-colors focus:outline-none",
-        darkFieldClass
-      )}
-    />
-  );
-}
-
-function TextareaField({
-  value,
-  onChange,
-  placeholder,
-}: {
-  value: string;
-  onChange: (value: string) => void;
-  placeholder?: string;
-}) {
-  return (
-    <textarea
-      value={value}
-      onChange={(event) => onChange(event.target.value)}
-      placeholder={placeholder}
-      rows={3}
-      className={cn(
-        "text-ivory w-full resize-none border-b bg-transparent px-1 py-2 text-sm font-light transition-colors focus:outline-none",
-        darkFieldClass
-      )}
-    />
-  );
-}
-
-function SelectField({
-  value,
-  onChange,
-  placeholder,
-  options,
-}: {
-  value: string;
-  onChange: (value: string) => void;
-  placeholder: string;
-  options: string[];
-}) {
-  return (
-    <div className="relative">
-      <select
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        className={cn(
-          "h-12 w-full cursor-pointer appearance-none border-b bg-transparent px-1 text-sm font-light transition-colors focus:outline-none",
-          value ? "text-ivory" : "text-ivory/40",
-          darkFieldClass,
-          "[&>option]:bg-charcoal [&>option]:text-ivory"
-        )}
-      >
-        <option value="" disabled>
-          {placeholder}
-        </option>
-        {options.map((option) => (
-          <option key={option} value={option}>
-            {option}
-          </option>
-        ))}
-      </select>
-      <ChevronDownIcon />
-    </div>
-  );
-}
-
-function ChevronDownIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-      className="text-champagne/70 pointer-events-none absolute top-1/2 right-1 size-4 -translate-y-1/2"
-    >
-      <path d="m6 9 6 6 6-6" />
-    </svg>
-  );
-}
+export default ConsultationForm;
