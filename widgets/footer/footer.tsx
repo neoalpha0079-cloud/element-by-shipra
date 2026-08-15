@@ -32,7 +32,7 @@ export default function Footer() {
           <div className="flex flex-col justify-between gap-6">
             <div>
               <Link href="/" className="inline-flex items-center gap-3">
-                <LogoMark />
+                <img src="/icon.png" className="size-10" />
                 <span className="flex flex-col leading-none">
                   <span className="font-serif text-xl font-medium tracking-[0.18em] text-[#fcfaf7]">
                     SHIPRA
