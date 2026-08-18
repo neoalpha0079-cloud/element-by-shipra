@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { useState } from "react";
 
 const serviceOptions = [
   "Interior Design",

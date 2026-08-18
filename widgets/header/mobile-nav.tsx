@@ -1,17 +1,19 @@
 "use client";
 
-import { useEffect } from "react";
+import { ArrowUpRight, Phone, X, Sparkles, Compass } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowUpRight, Phone, X, Sparkles, Compass } from "lucide-react";
+import { useEffect } from "react";
+
 import { mainNav } from "@/config/site";
 
 interface MobileNavProps {
   open: boolean;
   onClose: () => void;
+  phone?: string;
 }
 
-export function MobileNav({ open, onClose }: MobileNavProps) {
+export function MobileNav({ open, onClose, phone = "+91 99999 99999" }: MobileNavProps) {
   const pathname = usePathname();
 
   // Lock background scroll when drawer is open
@@ -130,11 +132,11 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
 
             {/* Direct Studio Phone Call Button */}
             <a
-              href="tel:+919999999999"
+              href={`tel:${String(phone).replace(/\s/g, "")}`}
               className="flex h-11 w-full items-center justify-center gap-2 rounded-[16px] border border-[#C59A58]/35 bg-white/[0.02] text-[12px] font-medium text-[#C59A58] transition-colors active:bg-[#C59A58]/10"
             >
               <Phone size={14} strokeWidth={1.5} />
-              <span>Call Studio (+91 99999 99999)</span>
+              <span>Call Studio ({phone})</span>
             </a>
           </div>
         </div>

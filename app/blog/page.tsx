@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 
+import { sanityFetch } from "@/sanity/lib";
+import { urlFor } from "@/sanity/lib/image";
+import { blogPostsQuery } from "@/sanity/lib/queries";
 import { SectionHeading } from "@/shared/components/sections/section-heading";
 
 export const metadata: Metadata = {
@@ -9,7 +12,14 @@ export const metadata: Metadata = {
     "Notes on design, materials and living beautifully from the Shipra Designs studio.",
 };
 
-const posts = [
+interface SanityBlogPost {
+  title: string;
+  category: string;
+  readTime: string;
+  image?: unknown;
+}
+
+const fallbackPosts = [
   {
     title: "Why a mood board matters more than a floor plan",
     category: "Process",
@@ -33,7 +43,18 @@ const posts = [
   },
 ];
 
-export default function BlogPage() {
+export default async function BlogPage() {
+  const sanityPosts = await sanityFetch<Array<SanityBlogPost>>(blogPostsQuery);
+
+  const posts = sanityPosts?.length
+    ? sanityPosts.map((post) => ({
+        title: post.title,
+        category: post.category,
+        readTime: post.readTime,
+        image: post.image ? urlFor(post.image).width(1200).quality(80).url() : fallbackPosts[0].image,
+      }))
+    : fallbackPosts;
+
   return (
     <main className="site-container pt-36 pb-24 md:pt-44 md:pb-32">
       <SectionHeading
