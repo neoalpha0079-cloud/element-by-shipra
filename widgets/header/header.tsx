@@ -1,16 +1,26 @@
 "use client";
 
+import { clsx } from "clsx";
+import { ArrowUpRight, Menu, X, Phone } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { ArrowUpRight, Menu, X, Phone } from "lucide-react";
-import { clsx } from "clsx";
 
+import { siteConfig } from "@/config/site";
 import { DesktopNav } from "@/widgets/header/desktop-nav";
 import { MobileNav } from "@/widgets/header/mobile-nav";
 
-export default function Header() {
+interface HeaderProps {
+  siteSettings?: {
+    name?: string;
+    phone?: string;
+  };
+}
+
+export default function Header({ siteSettings }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+
+  const phone = siteSettings?.phone ?? siteConfig.phone;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -68,7 +78,7 @@ export default function Header() {
 
               {/* Phone Icon - Always Visible (Desktop & Mobile) */}
               <a
-                href="tel:+919999999999"
+                href={`tel:${String(phone).replace(/\s/g, "")}`}
                 aria-label="Call Us"
                 className="flex size-[40px] lg:size-[42px] items-center justify-center rounded-full border border-[#b8874c]/80 text-[#c99655] transition-all duration-300 hover:bg-[#b8874c] hover:text-[#0b0b0a]"
               >
@@ -99,6 +109,7 @@ export default function Header() {
         <MobileNav
           open={mobileMenuOpen}
           onClose={() => setMobileMenuOpen(false)}
+          phone={phone}
         />
       </header>
 

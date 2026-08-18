@@ -1,6 +1,7 @@
 "use client";
 
 import { Mail, MapPin, Phone, Clock, Sparkles } from "lucide-react";
+
 import { siteConfig } from "@/config/site";
 import ConsultationForm from "@/features/consultation/components/consultation-form";
 

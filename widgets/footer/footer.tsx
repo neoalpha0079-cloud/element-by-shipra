@@ -1,9 +1,24 @@
-import Link from "next/link";
 import { ArrowUpRight, Phone, Mail, MapPin } from "lucide-react";
+import Link from "next/link";
 
 import { FacebookIcon, InstagramIcon, PinterestIcon } from "@/assets/icons";
 import { mainNav, siteConfig, socialLinks } from "@/config/site";
 import { LogoMark } from "@/shared/components/ui/logo";
+
+interface FooterProps {
+  siteSettings?: {
+    name?: string;
+    phone?: string;
+    email?: string;
+    address?: string;
+    brandStatement?: string;
+    socialLinks?: {
+      instagram?: string;
+      facebook?: string;
+      pinterest?: string;
+    };
+  };
+}
 
 const footerNav = (mainNav ?? []).filter((item) => item.href !== "/");
 const footerServices = [
@@ -14,20 +29,26 @@ const footerServices = [
   "Modular Furniture",
 ];
 
-export default function Footer() {
+export default function Footer({ siteSettings }: FooterProps) {
   const year = new Date().getFullYear();
+
+  const phone = siteSettings?.phone ?? siteConfig.phone;
+  const email = siteSettings?.email ?? siteConfig.email;
+  const address = siteSettings?.address ?? siteConfig.address;
+  const brandStatement =
+    siteSettings?.brandStatement ?? siteConfig.brandStatement;
+  const social = siteSettings?.socialLinks ?? socialLinks;
 
   return (
     <footer className="relative border-t border-[#3d342f] bg-[#1a1715] text-[#fcfaf7]">
       {/* Top Gold Accent Line */}
-      <div 
-        aria-hidden 
-        className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#c99655]/60 to-transparent" 
+      <div
+        aria-hidden
+        className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#c99655]/60 to-transparent"
       />
 
       <div className="site-container pt-16 pb-8 md:pt-20">
         <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1.2fr] lg:gap-8">
-          
           {/* ================= COL 1: LOGO & ABOUT ================= */}
           <div className="flex flex-col justify-between gap-6">
             <div>
@@ -44,16 +65,15 @@ export default function Footer() {
               </Link>
 
               <p className="mt-5 text-sm leading-6 max-w-sm text-[#c5beba]">
-                {siteConfig?.brandStatement ||
-                  "Crafting soulful interiors, elevations, and turnkey spaces that blend timeless elegance with tailored everyday comfort."}
+                {brandStatement}
               </p>
             </div>
 
             {/* Social Links */}
             <div className="flex items-center gap-4">
-              {socialLinks?.instagram && (
+              {social?.instagram && (
                 <a
-                  href={socialLinks.instagram}
+                  href={social.instagram}
                   target="_blank"
                   rel="noreferrer"
                   aria-label="Instagram"
@@ -62,9 +82,9 @@ export default function Footer() {
                   <InstagramIcon className="size-4" />
                 </a>
               )}
-              {socialLinks?.facebook && (
+              {social?.facebook && (
                 <a
-                  href={socialLinks.facebook}
+                  href={social.facebook}
                   target="_blank"
                   rel="noreferrer"
                   aria-label="Facebook"
@@ -73,9 +93,9 @@ export default function Footer() {
                   <FacebookIcon className="size-4" />
                 </a>
               )}
-              {socialLinks?.pinterest && (
+              {social?.pinterest && (
                 <a
-                  href={socialLinks.pinterest}
+                  href={social.pinterest}
                   target="_blank"
                   rel="noreferrer"
                   aria-label="Pinterest"
@@ -97,9 +117,7 @@ export default function Footer() {
                     className="group flex items-center justify-between text-sm text-[#c5beba] transition-colors hover:text-[#c99655]"
                   >
                     <span>{item.label}</span>
-                    <ArrowUpRight
-                      className="size-3.5 opacity-0 -translate-x-1 transition-all group-hover:opacity-100 group-hover:translate-x-0 text-[#c99655]" 
-                    />
+                    <ArrowUpRight className="size-3.5 opacity-0 -translate-x-1 transition-all group-hover:opacity-100 group-hover:translate-x-0 text-[#c99655]" />
                   </Link>
                 </li>
               ))}
@@ -125,32 +143,32 @@ export default function Footer() {
           {/* ================= COL 4: CONTACT & CTA ================= */}
           <FooterColumn title="Studio Inquiries">
             <ul className="flex flex-col gap-3.5 text-sm text-[#c5beba]">
-              {siteConfig?.phone && (
+              {phone && (
                 <li className="flex items-center gap-2.5">
                   <Phone className="size-4 text-[#c99655] shrink-0" />
                   <a
-                    href={`tel:${siteConfig.phone.replace(/\s/g, "")}`}
+                    href={`tel:${phone.replace(/\s/g, "")}`}
                     className="transition-colors hover:text-[#c99655]"
                   >
-                    {siteConfig.phone}
+                    {phone}
                   </a>
                 </li>
               )}
-              {siteConfig?.email && (
+              {email && (
                 <li className="flex items-center gap-2.5">
                   <Mail className="size-4 text-[#c99655] shrink-0" />
                   <a
-                    href={`mailto:${siteConfig.email}`}
+                    href={`mailto:${email}`}
                     className="transition-colors hover:text-[#c99655] truncate"
                   >
-                    {siteConfig.email}
+                    {email}
                   </a>
                 </li>
               )}
-              {siteConfig?.address && (
+              {address && (
                 <li className="flex items-start gap-2.5">
                   <MapPin className="size-4 text-[#c99655] shrink-0 mt-0.5" />
-                  <span className="text-[#c5beba]">{siteConfig.address}</span>
+                  <span className="text-[#c5beba]">{address}</span>
                 </li>
               )}
             </ul>
@@ -170,15 +188,22 @@ export default function Footer() {
         {/* ================= BOTTOM COPYRIGHT BAR ================= */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#968d87]">
           <p>
-            Copyright © {year} {siteConfig?.name || "Shipra"} | {siteConfig?.tagline || "Interior Design Studio"} | All Rights Reserved.
+            Copyright © {year} {siteSettings?.name ?? siteConfig.name} |{" "}
+            {siteConfig.tagline} | All Rights Reserved.
           </p>
 
           <div className="flex items-center gap-6">
-            <Link href="#contact" className="transition-colors hover:text-[#c99655]">
+            <Link
+              href="#contact"
+              className="transition-colors hover:text-[#c99655]"
+            >
               Privacy Policy
             </Link>
             <span>•</span>
-            <Link href="#contact" className="transition-colors hover:text-[#c99655]">
+            <Link
+              href="#contact"
+              className="transition-colors hover:text-[#c99655]"
+            >
               Terms of Service
             </Link>
           </div>
